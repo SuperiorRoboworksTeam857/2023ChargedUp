@@ -9,7 +9,13 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.LimelightSubsystem;
+
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -32,6 +38,8 @@ public class RobotContainer {
   private final int strafeAxis = Joystick.AxisType.kX.value;
   private final int rotationAxis = Joystick.AxisType.kTwist.value;
 
+  private final int wristAxis = XboxController.Axis.kLeftY.value;
+
   /* Driver Buttons */
   private final JoystickButton zeroGyro = new JoystickButton(driver, 4);
   private final JoystickButton robotCentric = new JoystickButton(driver, 3);
@@ -40,10 +48,20 @@ public class RobotContainer {
   private final JoystickButton highSpeed = new JoystickButton(driver, 2);
 
   /* Subsystems */
-  private final Swerve s_Swerve = new Swerve();
+  private final Swerve s_Swerve = new Swerve();  
+  public final LimelightSubsystem m_limelight = new LimelightSubsystem();
+  public final ElevatorSubsystem s_elevator = new ElevatorSubsystem();
+  public final WristSubsystem s_wrist = new WristSubsystem();
+
+  public final LEDSubsystem s_LED = new LEDSubsystem();
+
+
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    m_limelight.turnOnDriverCam();
+
     s_Swerve.setDefaultCommand(
         new TeleopSwerve(
             s_Swerve,
@@ -53,6 +71,12 @@ public class RobotContainer {
             () -> robotCentric.getAsBoolean(),
             () -> slowSpeed.getAsBoolean(),
             () -> highSpeed.getAsBoolean()));
+
+    s_elevator.setDefaultCommand(new RunCommand(() -> s_elevator.runElevator(0), s_elevator));
+
+    s_wrist.setDefaultCommand(new RunCommand(() -> s_wrist.runWrist(gamepad.getRawAxis(wristAxis)), s_wrist));
+
+    s_LED.setDefaultCommand(new RunCommand(() -> s_LED.setBlue(), s_LED));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -67,7 +91,22 @@ public class RobotContainer {
   private void configureButtonBindings() {
     /* Driver Buttons */
     zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+
+    new JoystickButton(driver, 5).onTrue(new InstantCommand(() -> m_limelight.toggleDriverCam(), m_limelight));
+    new JoystickButton(driver, 6)
+      .onTrue(new SequentialCommandGroup(
+            new InstantCommand(() -> m_limelight.enableLimelight(true), m_limelight)/* ,
+            new TurnToTargetCommand(m_robotDrive, m_limelight, m_driverStick, 50)*/))
+      .onFalse(new InstantCommand(() -> m_limelight.enableLimelight(false), m_limelight));
+
+
+    new POVButton(gamepad, 0).whileTrue(new RunCommand(() -> s_elevator.runElevator(-1), s_elevator));
+    new POVButton(gamepad, 180).whileTrue(new RunCommand(() -> s_elevator.runElevator(1), s_elevator));
+
+    new JoystickButton(gamepad, XboxController.Button.kX.value).whileTrue(new RunCommand(() -> s_LED.setPurple(), s_LED));
+    new JoystickButton(gamepad, XboxController.Button.kY.value).whileTrue(new RunCommand(() -> s_LED.setYellow(), s_LED));
   }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
