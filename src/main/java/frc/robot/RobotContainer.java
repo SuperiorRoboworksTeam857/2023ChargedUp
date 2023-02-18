@@ -75,9 +75,7 @@ public class RobotContainer {
             () -> highSpeed.getAsBoolean()));
 
     // No default elevator command
-    //s_elevator.setDefaultCommand(new RunCommand(() -> s_elevator.runElevator(0), s_elevator));
-
-    s_wrist.setDefaultCommand(new RunCommand(() -> s_wrist.runWrist(gamepad.getRawAxis(wristAxis)), s_wrist));
+    // No default wrist command
 
     s_LED.setDefaultCommand(new RunCommand(() -> s_LED.setBlue(), s_LED));
 
@@ -103,6 +101,9 @@ public class RobotContainer {
     new POVButton(driver, 270).whileTrue(new TurnToAngleCommand(s_Swerve, -90, 2));
 
     new JoystickButton(driver, 6).whileTrue(new RunCommand(() -> s_Swerve.setX(), s_Swerve));
+
+    new POVButton(gamepad, 270).whileTrue(new SelfBalanceCommand(s_Swerve));
+
     
 
     // Limelight controls
@@ -118,6 +119,9 @@ public class RobotContainer {
     new POVButton(gamepad, 90).whileTrue(new RunCommand(() -> s_elevator.goToPosition(ElevatorSubsystem.Positions.MID), s_elevator));
     new POVButton(gamepad, 180).whileTrue(new RunCommand(() -> s_elevator.goToPosition(ElevatorSubsystem.Positions.FLOOR), s_elevator));
 
+    // Wrist controls
+    new JoystickButton(gamepad, XboxController.Button.kLeftBumper.value).whileTrue(new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.VERTICAL), s_wrist));
+    new JoystickButton(gamepad, XboxController.Button.kRightBumper.value).whileTrue(new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.INTAKE), s_wrist));
 
 
     // LED controls
@@ -142,6 +146,10 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new testAuto(this);
+    if (buttonBox.getRawButton(3)) {
+      return new AutoPreloadChargeStation(this);
+    } else {
+      return new AutoMobility(this);
+    }
   }
 }
