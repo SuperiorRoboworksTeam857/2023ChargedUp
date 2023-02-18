@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -15,7 +17,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Swerve extends SubsystemBase {
-  private final ADIS16470_IMU gyro;
+  //private final ADIS16470_IMU gyro;
+  private final AHRS gyro;
 
   private SwerveDriveOdometry swerveOdometry;
   private SwerveModule[] mSwerveMods;
@@ -23,7 +26,8 @@ public class Swerve extends SubsystemBase {
   private Field2d field;
 
   public Swerve() {
-    gyro = new ADIS16470_IMU();
+    //gyro = new ADIS16470_IMU();
+    gyro = new AHRS();
     // gyro.configFactoryDefault();
     zeroGyro();
 
@@ -69,6 +73,14 @@ public class Swerve extends SubsystemBase {
     SmartDashboard.putNumber("pose X", swerveOdometry.getPoseMeters().getX());
     SmartDashboard.putNumber("pose Y", swerveOdometry.getPoseMeters().getY());
     SmartDashboard.putNumber("gyro angle", gyro.getAngle());
+
+    //SmartDashboard.putNumber("gyro filtered X", gyro.getXFilteredAccelAngle()); // loops between about 14...0...360...346
+    //SmartDashboard.putNumber("gyro filtered Y", gyro.getYFilteredAccelAngle()); // forward and back leveling
+    // 0-14, drive forward, 346-360 drive backward
+
+    SmartDashboard.putNumber("gyro pitch", gyro.getPitch());
+    SmartDashboard.putNumber("gyro roll", gyro.getRoll());
+
     return swerveOdometry.getPoseMeters();
   }
 
@@ -106,12 +118,35 @@ public class Swerve extends SubsystemBase {
         : Rotation2d.fromDegrees(gyro.getAngle());
   }
 
+  // public double getXFilteredAccelAngle() {
+  //   return gyro.getXFilteredAccelAngle();
+  // }
+
+  // public double getYFilteredAccelAngle() {
+  //   return gyro.getYFilteredAccelAngle();
+  // }
+
+  public double getPitch() {
+    return gyro.getPitch();
+  }
+
+  public double getRoll() {
+    return gyro.getRoll();
+  }
+
+  //SmartDashboard.putNumber("gyro filtered X", gyro.getXFilteredAccelAngle()); // loops between about 14...0...360...346
+  //SmartDashboard.putNumber("gyro filtered Y", gyro.getYFilteredAccelAngle()); // forward and back leveling
+  // 0-14, drive forward, 346-360 drive backward
+
+
+
   public void setX() {
     mSwerveMods[0].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)), true);
     mSwerveMods[1].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), true);
     mSwerveMods[2].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), true);
     mSwerveMods[3].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)), true);
   }
+  
 
   @Override
   public void periodic() {
