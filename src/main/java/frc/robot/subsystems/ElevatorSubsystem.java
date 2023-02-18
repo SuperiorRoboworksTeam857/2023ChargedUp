@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.revrobotics.CANSparkMax;
@@ -10,8 +9,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ElevatorSubsystem extends SubsystemBase{
-
-  //private SlewRateLimiter slewLimiter = new SlewRateLimiter(3.0);
 
   private static double deltaTime = 0.02;
   // Create a PID controller whose setpoint's change is subject to maximum
@@ -60,7 +57,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         m_goalPosition = 0;
         break;
       case MID:
-        m_goalPosition = -12;
+        m_goalPosition = -18;
         break;
       case HIGH:
         m_goalPosition = -23.5;
