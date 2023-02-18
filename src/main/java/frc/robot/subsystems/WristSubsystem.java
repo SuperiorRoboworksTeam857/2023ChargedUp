@@ -1,56 +1,77 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxAbsoluteEncoder;
+import com.revrobotics.SparkMaxPIDController;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class WristSubsystem extends SubsystemBase{
 
-  //private SlewRateLimiter slewLimiter = new SlewRateLimiter(3.0);
-
-
   CANSparkMax motor = new CANSparkMax(30, MotorType.kBrushless);
-  public WristSubsystem() {
   
+  private final AbsoluteEncoder m_absoluteEncoder;
+
+  private static final double verticalAngle = 0.94;
+  private static final double intakeAngle = 0.80;
+  private static final double horizontalAngle = 0.68;
+
+  public enum Positions {
+    HORIZONTAL,
+    INTAKE,
+    VERTICAL
+  }
+
+  private static double deltaTime = 0.02;
+  // Create a PID controller whose setpoint's change is subject to maximum
+  // velocity and acceleration constraints.
+  private final TrapezoidProfile.Constraints m_constraints =
+      new TrapezoidProfile.Constraints(1, 40);
+  private final ProfiledPIDController m_controller =
+      new ProfiledPIDController(4, 0.0, 0.0, m_constraints, deltaTime);
+
+
+  private double m_goalAngle = verticalAngle;
+
+
+  public WristSubsystem() {
+    m_absoluteEncoder = motor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
+
+    double encoderPositionFactor = (2 * Math.PI); // radians
+    double encoderVelocityFactor = (2 * Math.PI) / 60.0; // radians per second
+
+    motor.getEncoder().setPositionConversionFactor(encoderPositionFactor);
+    motor.getEncoder().setVelocityConversionFactor(encoderVelocityFactor);
   }
 
   @Override
   public void periodic() {
-    
+    m_controller.setGoal(m_goalAngle);
+    motor.set(m_controller.calculate(m_absoluteEncoder.getPosition()));
+
+    SmartDashboard.putNumber("wrist position", m_absoluteEncoder.getPosition());
+    SmartDashboard.putNumber("wrist speed", m_absoluteEncoder.getVelocity());
   }
 
-  public void runWrist(double speed) {
-    // -250 is top
-    //    0 is bottom
-    // negative speed goes up, positive speed goes down
-    boolean movingUp = (speed < 0);
-    boolean movingDown = (speed > 0);
-
-
-    //speed = slewLimiter.calculate(speed);
-
-//0, -110
-
-    //motor.set(speed * 0.1);
-    
-    // if ((motor.getEncoder().getPosition() < 90 && movingDown) ||
-    //     (motor.getEncoder().getPosition() > -90 && movingUp)) {
-      motor.set(speed*.2);
-    // }
-    // else {
-    //   motor.set(0);
-    // }
-    
-
-    SmartDashboard.putNumber("wrist speed", speed);
-    SmartDashboard.putNumber("wrist position", motor.getEncoder().getPosition());
+  public void goToAngle(Positions position) {
+    switch(position) {
+      case HORIZONTAL:
+        m_goalAngle = horizontalAngle;
+        break;
+      case INTAKE:
+        m_goalAngle = intakeAngle;
+        break;
+      case VERTICAL:
+        m_goalAngle = verticalAngle;
+        break;
+    }
   }
 
-
-  
   public void resetEncoders() {
     motor.getEncoder().setPosition(0);
   }
