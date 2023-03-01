@@ -141,6 +141,11 @@ public class SwerveModule {
     lastAngle = angle;
   }
 
+  public void setAngleForX(double angle) {
+    driveMotor.set(0);
+    angleController.setReference(angle, ControlType.kPosition);
+  }
+
   private Rotation2d getAngle() {
     return Rotation2d.fromDegrees(integratedAngleEncoder.getPosition());
   }
