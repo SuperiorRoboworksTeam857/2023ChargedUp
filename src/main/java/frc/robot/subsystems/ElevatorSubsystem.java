@@ -1,14 +1,13 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ElevatorSubsystem extends SubsystemBase{
+public class ElevatorSubsystem extends SubsystemBase {
 
   private static double deltaTime = 0.02;
   // Create a PID controller whose setpoint's change is subject to maximum
@@ -21,7 +20,7 @@ public class ElevatorSubsystem extends SubsystemBase{
   // or should we use SparkMaxPIDController?
 
   CANSparkMax motor = new CANSparkMax(20, MotorType.kBrushless);
-  
+
   // Range of motion of 0 inches at bottom to -24.5 inches at top
   public enum Positions {
     FLOOR,
@@ -38,7 +37,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     double driveConversionVelocityFactor = driveConversionPositionFactor / 60.0;
 
     motor.getEncoder().setVelocityConversionFactor(driveConversionVelocityFactor);
-    motor.getEncoder().setPositionConversionFactor(driveConversionPositionFactor);    
+    motor.getEncoder().setPositionConversionFactor(driveConversionPositionFactor);
   }
 
   @Override
@@ -48,11 +47,10 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     SmartDashboard.putNumber("elevator position", motor.getEncoder().getPosition());
     SmartDashboard.putNumber("elevator speed", motor.getEncoder().getVelocity());
-    
   }
 
   public void goToPosition(Positions position) {
-    switch(position) {
+    switch (position) {
       case FLOOR:
         m_goalPosition = 0;
         break;
@@ -68,7 +66,15 @@ public class ElevatorSubsystem extends SubsystemBase{
   public boolean isElevatorAtGoal() {
     return Math.abs(motor.getEncoder().getPosition() - m_goalPosition) < 1.0;
   }
-  
+
+  public boolean isElevatorHigh() {
+    return motor.getEncoder().getPosition() < -12;
+  }
+
+  public boolean isElevatorLow() {
+    return motor.getEncoder().getPosition() > -1;
+  }
+
   public void resetEncoders() {
     motor.getEncoder().setPosition(0);
   }
