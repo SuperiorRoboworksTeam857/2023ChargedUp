@@ -12,16 +12,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.RobotContainer;
 import frc.robot.commands.TurnToAngleCommand;
-import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.ElevatorSubsystem.Positions;
 
 public class testAuto extends SequentialCommandGroup {
@@ -33,36 +30,50 @@ public class testAuto extends SequentialCommandGroup {
                 AutoConstants.kMaxSpeedMetersPerSecond,
                 AutoConstants.kMaxAccelerationMetersPerSecondSquared),
             new PathPoint(
-                new Translation2d(Units.inchesToMeters(0), Units.inchesToMeters(0)), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)),
+                new Translation2d(Units.inchesToMeters(0), Units.inchesToMeters(0)),
+                Rotation2d.fromDegrees(0),
+                Rotation2d.fromDegrees(0)),
             new PathPoint(
-                new Translation2d(Units.inchesToMeters(180), Units.inchesToMeters(0)), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)));
+                new Translation2d(Units.inchesToMeters(180), Units.inchesToMeters(0)),
+                Rotation2d.fromDegrees(0),
+                Rotation2d.fromDegrees(0)));
     PathPlannerTrajectory trajectory2 =
         PathPlanner.generatePath(
             new PathConstraints(
                 AutoConstants.kMaxSpeedMetersPerSecond,
                 AutoConstants.kMaxAccelerationMetersPerSecondSquared),
             new PathPoint(
-                new Translation2d(Units.inchesToMeters(180), Units.inchesToMeters(0)), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(150)),
+                new Translation2d(Units.inchesToMeters(180), Units.inchesToMeters(0)),
+                Rotation2d.fromDegrees(0),
+                Rotation2d.fromDegrees(150)),
             new PathPoint(
-                new Translation2d(Units.inchesToMeters(230), Units.inchesToMeters(0)), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(150)));
+                new Translation2d(Units.inchesToMeters(230), Units.inchesToMeters(0)),
+                Rotation2d.fromDegrees(0),
+                Rotation2d.fromDegrees(150)));
     // PathPlannerTrajectory trajectory3 =
     //     PathPlanner.generatePath(
     //         new PathConstraints(
     //             AutoConstants.kMaxSpeedMetersPerSecond,
     //             AutoConstants.kMaxAccelerationMetersPerSecondSquared),
     //         new PathPoint(
-    //             new Translation2d(Units.inchesToMeters(-230), Units.inchesToMeters(0)), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(150)),
+    //             new Translation2d(Units.inchesToMeters(-230), Units.inchesToMeters(0)),
+    // Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(150)),
     //         new PathPoint(
-    //             new Translation2d(Units.inchesToMeters(-180), Units.inchesToMeters(0)), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(150)));
+    //             new Translation2d(Units.inchesToMeters(-180), Units.inchesToMeters(0)),
+    // Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(150)));
     PathPlannerTrajectory trajectory4 =
         PathPlanner.generatePath(
             new PathConstraints(
                 AutoConstants.kMaxSpeedMetersPerSecond,
                 AutoConstants.kMaxAccelerationMetersPerSecondSquared),
             new PathPoint(
-                new Translation2d(Units.inchesToMeters(230), Units.inchesToMeters(0)), Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(0)),
+                new Translation2d(Units.inchesToMeters(230), Units.inchesToMeters(0)),
+                Rotation2d.fromDegrees(180),
+                Rotation2d.fromDegrees(0)),
             new PathPoint(
-                new Translation2d(Units.inchesToMeters(0), Units.inchesToMeters(6)), Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(0)));
+                new Translation2d(Units.inchesToMeters(0), Units.inchesToMeters(6)),
+                Rotation2d.fromDegrees(180),
+                Rotation2d.fromDegrees(0)));
 
     var thetaController =
         new ProfiledPIDController(
@@ -118,17 +129,11 @@ public class testAuto extends SequentialCommandGroup {
             () ->
                 robot.s_Swerve.resetOdometry(
                     new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(0)))),
-
-        //new ParallelDeadlineGroup(new WaitCommand(1),  new RunCommand(() -> robot.s_elevator.goToPosition(Positions.HIGH), robot.s_elevator)),
-        
         new InstantCommand(() -> robot.s_elevator.goToPosition(Positions.HIGH), robot.s_elevator),
-        new RunCommand(() -> robot.s_elevator.goToPosition(Positions.HIGH), robot.s_elevator).until(robot.s_elevator::isElevatorAtGoal),
-        
+        new WaitUntilCommand(robot.s_elevator::isElevatorAtGoal),
         new WaitCommand(1),
-
         new InstantCommand(() -> robot.s_elevator.goToPosition(Positions.FLOOR), robot.s_elevator),
-        new RunCommand(() -> robot.s_elevator.goToPosition(Positions.FLOOR), robot.s_elevator).until(robot.s_elevator::isElevatorAtGoal),
-
+        new WaitUntilCommand(robot.s_elevator::isElevatorAtGoal),
         swerveControllerCommand1,
         new TurnToAngleCommand(robot.s_Swerve, 150, 2),
         swerveControllerCommand2,
