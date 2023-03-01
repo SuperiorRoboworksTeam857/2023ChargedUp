@@ -10,25 +10,19 @@ package frc.robot.subsystems;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-
-//import frc.robot.Constants.LimelightConstants;
+// import frc.robot.Constants.LimelightConstants;
 
 public class LimelightSubsystem extends SubsystemBase {
-  
 
-  public LimelightSubsystem() {
-    
-  }
+  public LimelightSubsystem() {}
 
   @Override
-  public void periodic() {
-    
-  }
+  public void periodic() {}
 
-  public boolean isTurnedToTarget(){
+  public boolean isTurnedToTarget() {
     boolean ans = false;
 
-    if (Math.abs(getLimelightValue("tx")) < 4.0){
+    if (Math.abs(getLimelightValue("tx")) < 4.0) {
       ans = true;
     }
 
@@ -55,9 +49,9 @@ public class LimelightSubsystem extends SubsystemBase {
 
   public void enableLimelight(boolean enabled) {
     if (enabled) {
-        setLimelightValue("ledMode", 0);
+      setLimelightValue("ledMode", 0);
     } else {
-        setLimelightValue("ledMode", 1);
+      setLimelightValue("ledMode", 1);
     }
   }
 
@@ -66,10 +60,11 @@ public class LimelightSubsystem extends SubsystemBase {
     double value = 0.0;
 
     if (entry.equals("tDistance")) {
-        // value = (LimelightConstants.kTargetHeight - LimelightConstants.kLimelightHeight) /
-        //   Math.tan(Math.toRadians(LimelightConstants.kLimelightAngle + getLimelightValue("ty")));
+      // value = (LimelightConstants.kTargetHeight - LimelightConstants.kLimelightHeight) /
+      //   Math.tan(Math.toRadians(LimelightConstants.kLimelightAngle + getLimelightValue("ty")));
     } else {
-        value = NetworkTableInstance.getDefault().getTable("limelight").getEntry(entry).getDouble(0.0);
+      value =
+          NetworkTableInstance.getDefault().getTable("limelight").getEntry(entry).getDouble(0.0);
     }
 
     return value;
@@ -78,6 +73,30 @@ public class LimelightSubsystem extends SubsystemBase {
   public void setLimelightValue(String entry, double value) {
     NetworkTableInstance.getDefault().getTable("limelight").getEntry(entry).setDouble(value);
   }
-}
-  
 
+  public void setLimelightArray(String entry, double[] value) {
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry(entry).setDoubleArray(value);
+  }
+
+  public enum Pipeline {
+    RetroTape,
+    AprilTags
+  }
+
+  public void setPipeline(Pipeline pipeline) {
+    double value = 0.0;
+    if (pipeline == Pipeline.RetroTape) {
+      value = 0;
+    } else if (pipeline == Pipeline.AprilTags) {
+      value = 1;
+    }
+    setLimelightValue("pipeline", value);
+
+    double[] cropValues = new double[4];
+    cropValues[0] = -1.0;
+    cropValues[1] = 1.0;
+    cropValues[2] = 0.0;
+    cropValues[3] = 1.0;
+    setLimelightArray("crop", cropValues);
+  }
+}
