@@ -4,22 +4,23 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.LimelightSubsystem;
-
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.IntakeSubsystem.GamePiece;
+import frc.robot.subsystems.LimelightSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -49,18 +50,19 @@ public class RobotContainer {
   private final JoystickButton highSpeed = new JoystickButton(driver, 2);
 
   /* Subsystems */
-  public final Swerve s_Swerve = new Swerve();  
+  public final Swerve s_Swerve = new Swerve();
   public final LimelightSubsystem m_limelight = new LimelightSubsystem();
   public final ElevatorSubsystem s_elevator = new ElevatorSubsystem();
   public final WristSubsystem s_wrist = new WristSubsystem();
+  //public final EntireArmSubsystem s_EntireArm = new EntireArmSubsystem();
 
   public final LEDSubsystem s_LED = new LEDSubsystem();
   public final IntakeSubsystem s_Intake = new IntakeSubsystem();
 
-
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    CameraServer.startAutomaticCapture();
 
     m_limelight.turnOnDriverCam();
 
@@ -71,15 +73,19 @@ public class RobotContainer {
             () -> -driver.getRawAxis(strafeAxis),
             () -> -driver.getRawAxis(rotationAxis),
             () -> robotCentric.getAsBoolean(),
-            () -> slowSpeed.getAsBoolean(),
+            () -> slowSpeed.getAsBoolean() || s_elevator.isElevatorHigh(),
             () -> highSpeed.getAsBoolean()));
 
     // No default elevator command
     // No default wrist command
 
-    s_LED.setDefaultCommand(new RunCommand(() -> s_LED.setBlue(), s_LED));
+    // s_LED.setDefaultCommand(new RunCommand(() -> s_LED.setBlue(), s_LED));
 
-    s_Intake.setDefaultCommand(new RunCommand(() -> s_Intake.runIntake(0), s_Intake));
+    // s_Intake.setDefaultCommand(new RunCommand(() -> s_Intake.runIntake(0), s_Intake));
+    s_Intake.setDefaultCommand(
+        new RunCommand(
+            () -> s_Intake.runIntake(gamepad.getRawAxis(XboxController.Axis.kLeftY.value)),
+            s_Intake));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -104,41 +110,104 @@ public class RobotContainer {
 
     new POVButton(gamepad, 270).whileTrue(new SelfBalanceCommand(s_Swerve));
 
-    
+    // new JoystickButton(gamepad, XboxController.Button.kA.value)
+    //     .whileTrue(
+    //         new InstantCommand(
+    //             () -> m_limelight.setPipeline(LimelightSubsystem.Pipeline.RetroTape)));
+    // new JoystickButton(gamepad, XboxController.Button.kB.value)
+    //     .whileTrue(
+    //         new InstantCommand(
+    //             () -> m_limelight.setPipeline(LimelightSubsystem.Pipeline.AprilTags)));
 
     // Limelight controls
-    new JoystickButton(gamepad, 5).onTrue(new InstantCommand(() -> m_limelight.toggleDriverCam(), m_limelight));
+    // new JoystickButton(gamepad, 5).onTrue(new InstantCommand(() -> m_limelight.toggleDriverCam(),
+    // m_limelight));
     new JoystickButton(driver, 4)
-      .onTrue(new SequentialCommandGroup(
-            new InstantCommand(() -> m_limelight.enableLimelight(true), m_limelight),
-            new StrafeToTargetCommand(s_Swerve, m_limelight, driver, 50)))
-      .onFalse(new InstantCommand(() -> m_limelight.enableLimelight(false), m_limelight));
+        .onTrue(
+            new SequentialCommandGroup(
+                new InstantCommand(() -> m_limelight.enableLimelight(true), m_limelight),
+                new StrafeToTargetCommand(s_Swerve, m_limelight, driver, 50)))
+        .onFalse(
+            new SequentialCommandGroup(
+                new InstantCommand(() -> m_limelight.enableLimelight(false), m_limelight),
+                new InstantCommand(() -> m_limelight.toggleDriverCam(), m_limelight)));
 
     // Elevator controls
-    new POVButton(gamepad, 0).whileTrue(new RunCommand(() -> s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH), s_elevator));
-    new POVButton(gamepad, 90).whileTrue(new RunCommand(() -> s_elevator.goToPosition(ElevatorSubsystem.Positions.MID), s_elevator));
-    new POVButton(gamepad, 180).whileTrue(new RunCommand(() -> s_elevator.goToPosition(ElevatorSubsystem.Positions.FLOOR), s_elevator));
+    new POVButton(gamepad, 0)
+        .whileTrue(
+            new RunCommand(
+                () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH), s_elevator));
+    new POVButton(gamepad, 90)
+        .whileTrue(
+            new RunCommand(
+                () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.MID), s_elevator));
+    new POVButton(gamepad, 180)
+        .whileTrue(
+            new RunCommand(
+                () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.FLOOR), s_elevator));
 
     // Wrist controls
-    new JoystickButton(gamepad, XboxController.Button.kLeftBumper.value).whileTrue(new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.VERTICAL), s_wrist));
-    new JoystickButton(gamepad, XboxController.Button.kRightBumper.value).whileTrue(new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.INTAKE), s_wrist));
+    new JoystickButton(gamepad, XboxController.Button.kLeftBumper.value)
+        .whileTrue(
+            new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.VERTICAL), s_wrist));
+    // new JoystickButton(gamepad, XboxController.Button.kRightBumper.value)
+    //     .whileTrue(
+    //         new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.INTAKE), s_wrist));
+    new JoystickButton(gamepad, XboxController.Button.kRightBumper.value)
+        .whileTrue(
+            new ConditionalCommand(
+                new RunCommand(
+                    () -> s_wrist.goToAngle(WristSubsystem.Positions.TOP_CONE_SCORE), s_wrist),
+                new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.INTAKE), s_wrist),
+                () -> s_elevator.isElevatorHigh()));
 
+    /*
+        // Elevator controls
+        new POVButton(gamepad, 0)
+            .whileTrue(
+                new RunCommand(
+                    () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH), s_elevator));
+        new POVButton(gamepad, 90)
+            .whileTrue(
+                new RunCommand(
+                    () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.MID), s_elevator));
+        new POVButton(gamepad, 180)
+            .whileTrue(
+                new RunCommand(
+                    () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.FLOOR), s_elevator));
 
+        // Wrist controls
+        new JoystickButton(gamepad, XboxController.Button.kLeftBumper.value)
+            .whileTrue(
+                new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.VERTICAL), s_wrist));
+        // new JoystickButton(gamepad, XboxController.Button.kRightBumper.value)
+        //     .whileTrue(
+        //         new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.INTAKE), s_wrist));
+        new JoystickButton(gamepad, XboxController.Button.kRightBumper.value)
+            .whileTrue(
+                new ConditionalCommand(
+                    new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.TOP_CONE_SCORE), s_wrist),
+                    new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.INTAKE), s_wrist),
+                    () -> s_elevator.isElevatorHigh()));
+    */
     // LED controls
-    new JoystickButton(gamepad, XboxController.Button.kX.value).whileTrue(
-      new ParallelCommandGroup(
-        new RunCommand(() -> s_LED.setPurple(), s_LED),
-        new RunCommand(() -> s_Intake.runIntake(0.5), s_Intake)
-      )
-    );
-    new JoystickButton(gamepad, XboxController.Button.kY.value).whileTrue(
-      new ParallelCommandGroup(
-        new RunCommand(() -> s_LED.setYellow(), s_LED),
-        new RunCommand(() -> s_Intake.runIntake(-0.5), s_Intake)
-      )
-    );
+    new JoystickButton(gamepad, XboxController.Button.kX.value)
+        .whileTrue(
+            new ParallelCommandGroup(
+                new RunCommand(() -> s_LED.setPurple(), s_LED),
+                new RunCommand(() -> s_Intake.setGamePiece(GamePiece.Cube)),
+                new RunCommand(() -> m_limelight.setPipeline(LimelightSubsystem.Pipeline.AprilTags))
+                // new RunCommand(() -> s_Intake.runIntake(0.5), s_Intake)
+                ));
+    new JoystickButton(gamepad, XboxController.Button.kY.value)
+        .whileTrue(
+            new ParallelCommandGroup(
+                new RunCommand(() -> s_LED.setYellow(), s_LED),
+                new RunCommand(() -> s_Intake.setGamePiece(GamePiece.Cone)),
+                new RunCommand(() -> m_limelight.setPipeline(LimelightSubsystem.Pipeline.RetroTape))
+                // new RunCommand(() -> s_Intake.runIntake(-0.5), s_Intake)
+                ));
   }
-
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -147,7 +216,13 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     if (buttonBox.getRawButton(3)) {
-      return new AutoPreloadChargeStation(this);
+      return new AutoPreloadConeChargeStation(this);
+    } else if (buttonBox.getRawButton(4)) {
+      return new AutoPreloadCubeChargeStation(this);
+    } else if (buttonBox.getRawButton(5)) {
+      return new AutoBlueLeft(this);
+    } else if (buttonBox.getRawButton(6)) {
+      return new AutoRedRight(this);
     } else {
       return new AutoMobility(this);
     }
