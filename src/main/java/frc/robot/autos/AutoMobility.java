@@ -14,22 +14,24 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.RobotContainer;
 
 public class AutoMobility extends SequentialCommandGroup {
   public AutoMobility(RobotContainer robot) {
 
     PathPlannerTrajectory trajectory1 =
         PathPlanner.generatePath(
-            new PathConstraints(
-                1,
-                AutoConstants.kMaxAccelerationMetersPerSecondSquared),
+            new PathConstraints(1, AutoConstants.kMaxAccelerationMetersPerSecondSquared),
             new PathPoint(
-                new Translation2d(Units.inchesToMeters(0), Units.inchesToMeters(0)), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)),
+                new Translation2d(Units.inchesToMeters(0), Units.inchesToMeters(0)),
+                Rotation2d.fromDegrees(0),
+                Rotation2d.fromDegrees(0)),
             new PathPoint(
-                new Translation2d(Units.inchesToMeters(160), Units.inchesToMeters(0)), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)));
-    
+                new Translation2d(Units.inchesToMeters(160), Units.inchesToMeters(0)),
+                Rotation2d.fromDegrees(0),
+                Rotation2d.fromDegrees(0)));
+
     var thetaController =
         new ProfiledPIDController(
             Constants.AutoConstants.kPThetaController,
