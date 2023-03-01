@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -10,14 +9,13 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Swerve extends SubsystemBase {
-  //private final ADIS16470_IMU gyro;
+  // private final ADIS16470_IMU gyro;
   private final AHRS gyro;
 
   private SwerveDriveOdometry swerveOdometry;
@@ -26,7 +24,7 @@ public class Swerve extends SubsystemBase {
   private Field2d field;
 
   public Swerve() {
-    //gyro = new ADIS16470_IMU();
+    // gyro = new ADIS16470_IMU();
     gyro = new AHRS();
     // gyro.configFactoryDefault();
     zeroGyro();
@@ -74,12 +72,15 @@ public class Swerve extends SubsystemBase {
     SmartDashboard.putNumber("pose Y", swerveOdometry.getPoseMeters().getY());
     SmartDashboard.putNumber("gyro angle", gyro.getAngle());
 
-    //SmartDashboard.putNumber("gyro filtered X", gyro.getXFilteredAccelAngle()); // loops between about 14...0...360...346
-    //SmartDashboard.putNumber("gyro filtered Y", gyro.getYFilteredAccelAngle()); // forward and back leveling
+    // SmartDashboard.putNumber("gyro filtered X", gyro.getXFilteredAccelAngle()); // loops between
+    // about 14...0...360...346
+    // SmartDashboard.putNumber("gyro filtered Y", gyro.getYFilteredAccelAngle()); // forward and
+    // back leveling
     // 0-14, drive forward, 346-360 drive backward
 
     SmartDashboard.putNumber("gyro pitch", gyro.getPitch());
     SmartDashboard.putNumber("gyro roll", gyro.getRoll());
+    SmartDashboard.putNumber("pitch rate", getPitchRate());
 
     return swerveOdometry.getPoseMeters();
   }
@@ -130,23 +131,26 @@ public class Swerve extends SubsystemBase {
     return gyro.getPitch();
   }
 
+  public double getPitchRate() {
+    return gyro.getRawGyroY();
+  }
+
   public double getRoll() {
     return gyro.getRoll();
   }
 
-  //SmartDashboard.putNumber("gyro filtered X", gyro.getXFilteredAccelAngle()); // loops between about 14...0...360...346
-  //SmartDashboard.putNumber("gyro filtered Y", gyro.getYFilteredAccelAngle()); // forward and back leveling
+  // SmartDashboard.putNumber("gyro filtered X", gyro.getXFilteredAccelAngle()); // loops between
+  // about 14...0...360...346
+  // SmartDashboard.putNumber("gyro filtered Y", gyro.getYFilteredAccelAngle()); // forward and back
+  // leveling
   // 0-14, drive forward, 346-360 drive backward
 
-
-
   public void setX() {
-    mSwerveMods[0].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)), true);
-    mSwerveMods[1].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), true);
-    mSwerveMods[2].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), true);
-    mSwerveMods[3].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)), true);
+    mSwerveMods[0].setAngleForX(45);
+    mSwerveMods[1].setAngleForX(-45);
+    mSwerveMods[2].setAngleForX(-45);
+    mSwerveMods[3].setAngleForX(45);
   }
-  
 
   @Override
   public void periodic() {
