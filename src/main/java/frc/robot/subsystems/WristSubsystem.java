@@ -4,26 +4,28 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
-import com.revrobotics.SparkMaxPIDController;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class WristSubsystem extends SubsystemBase{
+public class WristSubsystem extends SubsystemBase {
 
   CANSparkMax motor = new CANSparkMax(30, MotorType.kBrushless);
-  
+
   private final AbsoluteEncoder m_absoluteEncoder;
 
-  private static final double verticalAngle = 0.94;
-  private static final double intakeAngle = 0.80;
   private static final double horizontalAngle = 0.68;
+  private static final double intakeAngle = 0.765;
+  private static final double coneScoreAngle = 0.82;
+  private static final double slightlyPastVerticalAngle = 0.9;
+  private static final double verticalAngle = 0.945;
 
   public enum Positions {
     HORIZONTAL,
     INTAKE,
+    TOP_CONE_SCORE,
+    SLIGHTLY_OUT,
     VERTICAL
   }
 
@@ -33,11 +35,9 @@ public class WristSubsystem extends SubsystemBase{
   private final TrapezoidProfile.Constraints m_constraints =
       new TrapezoidProfile.Constraints(1, 40);
   private final ProfiledPIDController m_controller =
-      new ProfiledPIDController(4, 0.0, 0.0, m_constraints, deltaTime);
-
+      new ProfiledPIDController(5, 0.0, 0.0, m_constraints, deltaTime);
 
   private double m_goalAngle = verticalAngle;
-
 
   public WristSubsystem() {
     m_absoluteEncoder = motor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
@@ -59,17 +59,27 @@ public class WristSubsystem extends SubsystemBase{
   }
 
   public void goToAngle(Positions position) {
-    switch(position) {
+    switch (position) {
       case HORIZONTAL:
         m_goalAngle = horizontalAngle;
         break;
       case INTAKE:
         m_goalAngle = intakeAngle;
         break;
+      case TOP_CONE_SCORE:
+        m_goalAngle = coneScoreAngle;
+        break;
+      case SLIGHTLY_OUT:
+        m_goalAngle = slightlyPastVerticalAngle;
+        break;
       case VERTICAL:
         m_goalAngle = verticalAngle;
         break;
     }
+  }
+
+  public boolean isWristAtGoal() {
+    return Math.abs(m_absoluteEncoder.getPosition() - m_goalAngle) < 0.03;
   }
 
   public void resetEncoders() {
