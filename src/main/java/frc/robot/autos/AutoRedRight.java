@@ -40,7 +40,7 @@ public class AutoRedRight extends SequentialCommandGroup {
             new PathPoint(
                 new Translation2d(Units.inchesToMeters(195), Units.inchesToMeters(0)),
                 Rotation2d.fromDegrees(0),
-                Rotation2d.fromDegrees(-140)));
+                Rotation2d.fromDegrees(-155)));
     PathPlannerTrajectory trajectory2 =
         PathPlanner.generatePath(
             new PathConstraints(
@@ -73,7 +73,7 @@ public class AutoRedRight extends SequentialCommandGroup {
             new PathPoint(
                 new Translation2d(Units.inchesToMeters(195), Units.inchesToMeters(0)),
                 Rotation2d.fromDegrees(180),
-                Rotation2d.fromDegrees(-140)),
+                Rotation2d.fromDegrees(-155)),
             new PathPoint(
                 new Translation2d(Units.inchesToMeters(100), Units.inchesToMeters(0)),
                 Rotation2d.fromDegrees(180),
@@ -138,7 +138,10 @@ public class AutoRedRight extends SequentialCommandGroup {
                 robot.s_Swerve.resetOdometry(
                     new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(0)))),
 
-        // Raise elevator
+        // Raise elevator and tilt wrist slightly out
+        new InstantCommand(
+            () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT),
+            robot.s_wrist),
         new InstantCommand(
             () -> robot.s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH),
             robot.s_elevator),
@@ -174,6 +177,7 @@ public class AutoRedRight extends SequentialCommandGroup {
                     () -> robot.s_Intake.intakeGamePiece(IntakeSubsystem.GamePiece.Cube),
                     robot.s_Intake))),
 
+        new InstantCommand(() -> robot.s_Swerve.drive(new Translation2d(0, 0), 0, false, true)),
         // Turn to angle
         // new TurnToAngleCommand(robot.s_Swerve, -90, 2),
 
@@ -193,14 +197,15 @@ public class AutoRedRight extends SequentialCommandGroup {
 
         // Drive at drive station
         swerveControllerCommand4,
+        new InstantCommand(() -> robot.s_Swerve.drive(new Translation2d(0, 0), 0, false, true)),
 
         // Lower wrist and spit out cube
         new InstantCommand(
-            () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.INTAKE), robot.s_wrist),
+            () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT), robot.s_wrist),
         new WaitUntilCommand(robot.s_wrist::isWristAtGoal),
         new InstantCommand(
             () -> robot.s_Intake.outtakeGamePiece(IntakeSubsystem.GamePiece.Cube), robot.s_Intake),
-        new WaitCommand(0.2),
+        new WaitCommand(1),
 
         // Raise wrist
         new InstantCommand(
