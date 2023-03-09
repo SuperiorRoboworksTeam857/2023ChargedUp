@@ -16,6 +16,7 @@ public class WristSubsystem extends SubsystemBase {
   private final AbsoluteEncoder m_absoluteEncoder;
 
   private static final double horizontalAngle = 0.68;
+  private static final double substationAngle = 0.765;
   private static final double intakeAngle = 0.765;
   private static final double coneScoreAngle = 0.82;
   private static final double slightlyPastVerticalAngle = 0.9;
@@ -23,6 +24,7 @@ public class WristSubsystem extends SubsystemBase {
 
   public enum Positions {
     HORIZONTAL,
+    SUBSTATION_INTAKE,
     INTAKE,
     TOP_CONE_SCORE,
     SLIGHTLY_OUT,
@@ -62,6 +64,9 @@ public class WristSubsystem extends SubsystemBase {
     switch (position) {
       case HORIZONTAL:
         m_goalAngle = horizontalAngle;
+        break;
+      case SUBSTATION_INTAKE:
+        m_goalAngle = substationAngle;
         break;
       case INTAKE:
         m_goalAngle = intakeAngle;
