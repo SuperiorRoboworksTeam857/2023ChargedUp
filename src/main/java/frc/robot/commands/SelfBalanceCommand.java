@@ -51,12 +51,12 @@ public class SelfBalanceCommand extends CommandBase {
     // if (angle > 180) {
     //     angle = -(360 - angle);
     // }
-    if (Math.abs(s_Swerve.getPitchRate()) > 15) {
+    if (Math.abs(s_Swerve.getPitchRate()) > 10) {
       s_Swerve.setX();
     } else if (angle > 4) {
-      s_Swerve.drive(new Translation2d(-0.3, 0), 0, false, true);
+      s_Swerve.drive(new Translation2d(-0.45, 0), 0, false, true);
     } else if (angle < -4) {
-      s_Swerve.drive(new Translation2d(0.3, 0), 0, false, true);
+      s_Swerve.drive(new Translation2d(0.45, 0), 0, false, true);
     } else {
       s_Swerve.setX();
       // s_Swerve.drive(new Translation2d(0, 0), 0, false, true);
