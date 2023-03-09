@@ -85,7 +85,10 @@ public class AutoPreloadConeChargeStation extends SequentialCommandGroup {
                 robot.s_Swerve.resetOdometry(
                     new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(0)))),
 
-        // Raise elevator
+        // Raise elevator and tilt wrist slightly out
+        new InstantCommand(
+            () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT),
+            robot.s_wrist),
         new InstantCommand(
             () -> robot.s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH),
             robot.s_elevator),
@@ -121,7 +124,8 @@ public class AutoPreloadConeChargeStation extends SequentialCommandGroup {
         new ParallelRaceGroup(new SelfBalanceCommand(robot.s_Swerve), new WaitCommand(3)),
 
         // Stop
-        new InstantCommand(() -> robot.s_Swerve.setX(), robot.s_Swerve));
+        new InstantCommand(() -> robot.s_Swerve.setX(), robot.s_Swerve),
+        new WaitCommand(3));
     // new InstantCommand(() -> robot.s_Swerve.drive(new Translation2d(0, 0), 0, false, true)));
   }
 }
