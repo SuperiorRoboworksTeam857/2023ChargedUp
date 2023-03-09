@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -84,7 +85,7 @@ public class RobotContainer {
     // s_Intake.setDefaultCommand(new RunCommand(() -> s_Intake.runIntake(0), s_Intake));
     s_Intake.setDefaultCommand(
         new RunCommand(
-            () -> s_Intake.runIntake(gamepad.getRawAxis(XboxController.Axis.kLeftY.value)),
+            () -> s_Intake.runIntake(gamepad.getRawAxis(XboxController.Axis.kRightY.value)),
             s_Intake));
 
     // Configure the button bindings
@@ -135,12 +136,22 @@ public class RobotContainer {
     // Elevator controls
     new POVButton(gamepad, 0)
         .whileTrue(
-            new RunCommand(
-                () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH), s_elevator));
+            new SequentialCommandGroup(
+                new InstantCommand(
+                    () -> s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT), s_wrist),
+                new InstantCommand(
+                    () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH), s_elevator)
+            )
+        );
     new POVButton(gamepad, 90)
         .whileTrue(
-            new RunCommand(
-                () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.MID), s_elevator));
+            new SequentialCommandGroup(
+                new InstantCommand(
+                    () -> s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT), s_wrist),
+                new InstantCommand(
+                    () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.MID), s_elevator)
+            )
+        );
     new POVButton(gamepad, 180)
         .whileTrue(
             new RunCommand(
@@ -161,35 +172,9 @@ public class RobotContainer {
                 new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.INTAKE), s_wrist),
                 () -> s_elevator.isElevatorHigh()));
 
-    /*
-        // Elevator controls
-        new POVButton(gamepad, 0)
-            .whileTrue(
-                new RunCommand(
-                    () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH), s_elevator));
-        new POVButton(gamepad, 90)
-            .whileTrue(
-                new RunCommand(
-                    () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.MID), s_elevator));
-        new POVButton(gamepad, 180)
-            .whileTrue(
-                new RunCommand(
-                    () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.FLOOR), s_elevator));
+    new Trigger(() -> gamepad.getRawAxis(3) > 0.5).whileTrue(new RunCommand(
+        () -> s_wrist.goToAngle(WristSubsystem.Positions.SUBSTATION_INTAKE), s_wrist));
 
-        // Wrist controls
-        new JoystickButton(gamepad, XboxController.Button.kLeftBumper.value)
-            .whileTrue(
-                new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.VERTICAL), s_wrist));
-        // new JoystickButton(gamepad, XboxController.Button.kRightBumper.value)
-        //     .whileTrue(
-        //         new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.INTAKE), s_wrist));
-        new JoystickButton(gamepad, XboxController.Button.kRightBumper.value)
-            .whileTrue(
-                new ConditionalCommand(
-                    new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.TOP_CONE_SCORE), s_wrist),
-                    new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.INTAKE), s_wrist),
-                    () -> s_elevator.isElevatorHigh()));
-    */
     // LED controls
     new JoystickButton(gamepad, XboxController.Button.kX.value)
         .whileTrue(
@@ -223,6 +208,8 @@ public class RobotContainer {
       return new AutoBlueLeft(this);
     } else if (buttonBox.getRawButton(6)) {
       return new AutoRedRight(this);
+    } else if (buttonBox.getRawButton(7)) {
+      return new testAuto(this);
     } else {
       return new AutoMobility(this);
     }
