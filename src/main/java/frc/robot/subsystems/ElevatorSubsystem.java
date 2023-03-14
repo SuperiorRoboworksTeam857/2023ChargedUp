@@ -24,6 +24,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   // Range of motion of 0 inches at bottom to -24.5 inches at top
   public enum Positions {
     FLOOR,
+    SUBSTATION_SIDEWAYS_CONE,
     MID,
     HIGH
   }
@@ -54,11 +55,14 @@ public class ElevatorSubsystem extends SubsystemBase {
       case FLOOR:
         m_goalPosition = 0;
         break;
+      case SUBSTATION_SIDEWAYS_CONE:
+        m_goalPosition = -10.125;
+        break;
       case MID:
-        m_goalPosition = -18;
+        m_goalPosition = -17.625;
         break;
       case HIGH:
-        m_goalPosition = -23.5;
+        m_goalPosition = -23.125;
         break;
     }
   }
