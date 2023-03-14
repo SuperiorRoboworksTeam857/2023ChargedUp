@@ -119,6 +119,10 @@ public class Swerve extends SubsystemBase {
         : Rotation2d.fromDegrees(gyro.getAngle());
   }
 
+  public double getYawRate() {
+    return gyro.getRawGyroZ();
+  }
+
   // public double getXFilteredAccelAngle() {
   //   return gyro.getXFilteredAccelAngle();
   // }
