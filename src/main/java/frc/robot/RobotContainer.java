@@ -66,6 +66,7 @@ public class RobotContainer {
     CameraServer.startAutomaticCapture();
 
     m_limelight.turnOnDriverCam();
+    m_limelight.enableLimelight(false);
 
     s_Swerve.setDefaultCommand(
         new TeleopSwerve(
@@ -109,7 +110,7 @@ public class RobotContainer {
 
     new JoystickButton(driver, 6).whileTrue(new RunCommand(() -> s_Swerve.setX(), s_Swerve));
 
-    new POVButton(gamepad, 270).whileTrue(new SelfBalanceCommand(s_Swerve));
+    //new POVButton(gamepad, 270).whileTrue(new SelfBalanceCommand(s_Swerve));
 
     // new JoystickButton(gamepad, XboxController.Button.kA.value)
     //     .whileTrue(
@@ -123,15 +124,17 @@ public class RobotContainer {
     // Limelight controls
     // new JoystickButton(gamepad, 5).onTrue(new InstantCommand(() -> m_limelight.toggleDriverCam(),
     // m_limelight));
-    new JoystickButton(driver, 4)
-        .onTrue(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> m_limelight.enableLimelight(true), m_limelight),
-                new StrafeToTargetCommand(s_Swerve, m_limelight, driver, 50)))
-        .onFalse(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> m_limelight.enableLimelight(false), m_limelight),
-                new InstantCommand(() -> m_limelight.toggleDriverCam(), m_limelight)));
+
+
+    // new JoystickButton(driver, 4)
+    //     .onTrue(
+    //         new SequentialCommandGroup(
+    //             new InstantCommand(() -> m_limelight.enableLimelight(true), m_limelight),
+    //             new StrafeToTargetCommand(s_Swerve, m_limelight, driver, 50)))
+    //     .onFalse(
+    //         new SequentialCommandGroup(
+    //             new InstantCommand(() -> m_limelight.enableLimelight(false), m_limelight),
+    //             new InstantCommand(() -> m_limelight.toggleDriverCam(), m_limelight)));
 
     // Elevator controls
     new POVButton(gamepad, 0)
@@ -150,6 +153,15 @@ public class RobotContainer {
                     () -> s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT), s_wrist),
                 new InstantCommand(
                     () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.MID), s_elevator)
+            )
+        );
+    new POVButton(gamepad, 270)
+        .whileTrue(
+            new SequentialCommandGroup(
+                new InstantCommand(
+                    () -> s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT), s_wrist),
+                new InstantCommand(
+                    () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.SUBSTATION_SIDEWAYS_CONE), s_elevator)
             )
         );
     new POVButton(gamepad, 180)
@@ -180,16 +192,16 @@ public class RobotContainer {
         .whileTrue(
             new ParallelCommandGroup(
                 new RunCommand(() -> s_LED.setPurple(), s_LED),
-                new RunCommand(() -> s_Intake.setGamePiece(GamePiece.Cube)),
-                new RunCommand(() -> m_limelight.setPipeline(LimelightSubsystem.Pipeline.AprilTags))
+                new RunCommand(() -> s_Intake.setGamePiece(GamePiece.Cube))
+                //new RunCommand(() -> m_limelight.setPipeline(LimelightSubsystem.Pipeline.AprilTags))
                 // new RunCommand(() -> s_Intake.runIntake(0.5), s_Intake)
                 ));
     new JoystickButton(gamepad, XboxController.Button.kY.value)
         .whileTrue(
             new ParallelCommandGroup(
                 new RunCommand(() -> s_LED.setYellow(), s_LED),
-                new RunCommand(() -> s_Intake.setGamePiece(GamePiece.Cone)),
-                new RunCommand(() -> m_limelight.setPipeline(LimelightSubsystem.Pipeline.RetroTape))
+                new RunCommand(() -> s_Intake.setGamePiece(GamePiece.Cone))
+                //new RunCommand(() -> m_limelight.setPipeline(LimelightSubsystem.Pipeline.RetroTape))
                 // new RunCommand(() -> s_Intake.runIntake(-0.5), s_Intake)
                 ));
   }
@@ -205,11 +217,11 @@ public class RobotContainer {
     } else if (buttonBox.getRawButton(4)) {
       return new AutoPreloadCubeChargeStation(this);
     } else if (buttonBox.getRawButton(5)) {
-      return new AutoBlueLeft(this);
+      return new AutoBlueLeftTwoHigh(this);
     } else if (buttonBox.getRawButton(6)) {
       return new AutoRedRight(this);
     } else if (buttonBox.getRawButton(7)) {
-      return new testAuto(this);
+      return new AutoPreloadConeChargeStationPlusCone(this);
     } else {
       return new AutoMobility(this);
     }
