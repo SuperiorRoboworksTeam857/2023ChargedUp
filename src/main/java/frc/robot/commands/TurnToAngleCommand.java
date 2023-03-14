@@ -32,16 +32,19 @@ public class TurnToAngleCommand extends CommandBase {
 
   @Override
   public void execute() {
-    double gyroAngle = s_Swerve.getYaw().getDegrees();
+    double gyroAngle = s_Swerve.getYaw().getDegrees();  // do we need to negate this number?
 
     final double kP = 0.2;
-    SmartDashboard.putNumber("gyroAngle", gyroAngle);
+    SmartDashboard.putNumber("TurnToAngle - gyroAngle", gyroAngle);
+    SmartDashboard.putNumber("TurnToAngle - goal angle", angle);
 
     if (angle > 180) {
       angle = -(360 - angle);
     } else if (angle < -180) {
       angle = 360 + angle;
     }
+
+    SmartDashboard.putNumber("TurnToAngle - corrected goal angle", angle);
 
     double err = angle - gyroAngle;
     double speed =
@@ -50,7 +53,10 @@ public class TurnToAngleCommand extends CommandBase {
             -Constants.Swerve.maxAngularVelocity * 0.5,
             Constants.Swerve.maxAngularVelocity * 0.5);
 
-    if (Math.abs(err) > 2 && timer.get() < timeout) {
+    SmartDashboard.putNumber("TurnToAngle - speed", speed);
+
+
+    if ((Math.abs(err) > 2 || Math.abs(s_Swerve.getYawRate()) > 1) && timer.get() < timeout) {
       s_Swerve.drive(new Translation2d(0, 0), speed, false, true);
     } else {
       complete = true;
