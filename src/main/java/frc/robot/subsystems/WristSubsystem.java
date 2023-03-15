@@ -20,7 +20,7 @@ public class WristSubsystem extends SubsystemBase {
   private static final double intakeAngle = 0.765;
   private static final double coneScoreAngle = 0.82;
   private static final double slightlyPastVerticalAngle = 0.9;
-  private static final double verticalAngle = 0.948;
+  private static final double verticalAngle = 0.950;
 
   public enum Positions {
     HORIZONTAL,
