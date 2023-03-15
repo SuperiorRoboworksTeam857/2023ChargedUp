@@ -41,8 +41,6 @@ public class RobotContainer {
   private final int strafeAxis = Joystick.AxisType.kX.value;
   private final int rotationAxis = Joystick.AxisType.kTwist.value;
 
-  private final int wristAxis = XboxController.Axis.kLeftY.value;
-
   /* Driver Buttons */
   private final JoystickButton zeroGyro = new JoystickButton(driver, 5);
   private final JoystickButton robotCentric = new JoystickButton(driver, 3);
@@ -55,7 +53,7 @@ public class RobotContainer {
   public final LimelightSubsystem m_limelight = new LimelightSubsystem();
   public final ElevatorSubsystem s_elevator = new ElevatorSubsystem();
   public final WristSubsystem s_wrist = new WristSubsystem();
-  //public final EntireArmSubsystem s_EntireArm = new EntireArmSubsystem();
+  // public final EntireArmSubsystem s_EntireArm = new EntireArmSubsystem();
 
   public final IntakeSubsystem s_Intake = new IntakeSubsystem();
 
@@ -109,7 +107,7 @@ public class RobotContainer {
 
     new JoystickButton(driver, 6).whileTrue(new RunCommand(() -> s_Swerve.setX(), s_Swerve));
 
-    //new POVButton(gamepad, 270).whileTrue(new SelfBalanceCommand(s_Swerve));
+    // new POVButton(gamepad, 270).whileTrue(new SelfBalanceCommand(s_Swerve));
 
     // new JoystickButton(gamepad, XboxController.Button.kA.value)
     //     .whileTrue(
@@ -123,7 +121,6 @@ public class RobotContainer {
     // Limelight controls
     // new JoystickButton(gamepad, 5).onTrue(new InstantCommand(() -> m_limelight.toggleDriverCam(),
     // m_limelight));
-
 
     // new JoystickButton(driver, 4)
     //     .onTrue(
@@ -142,27 +139,24 @@ public class RobotContainer {
                 new InstantCommand(
                     () -> s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT), s_wrist),
                 new InstantCommand(
-                    () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH), s_elevator)
-            )
-        );
+                    () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH), s_elevator)));
     new POVButton(gamepad, 90)
         .whileTrue(
             new SequentialCommandGroup(
                 new InstantCommand(
                     () -> s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT), s_wrist),
                 new InstantCommand(
-                    () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.MID), s_elevator)
-            )
-        );
+                    () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.MID), s_elevator)));
     new POVButton(gamepad, 270)
         .whileTrue(
             new SequentialCommandGroup(
                 new InstantCommand(
                     () -> s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT), s_wrist),
                 new InstantCommand(
-                    () -> s_elevator.goToPosition(ElevatorSubsystem.Positions.SUBSTATION_SIDEWAYS_CONE), s_elevator)
-            )
-        );
+                    () ->
+                        s_elevator.goToPosition(
+                            ElevatorSubsystem.Positions.SUBSTATION_SIDEWAYS_CONE),
+                    s_elevator)));
     new POVButton(gamepad, 180)
         .whileTrue(
             new RunCommand(
@@ -183,22 +177,26 @@ public class RobotContainer {
                 new RunCommand(() -> s_wrist.goToAngle(WristSubsystem.Positions.INTAKE), s_wrist),
                 () -> s_elevator.isElevatorHigh()));
 
-    new Trigger(() -> gamepad.getRawAxis(3) > 0.5).whileTrue(new RunCommand(
-        () -> s_wrist.goToAngle(WristSubsystem.Positions.SUBSTATION_INTAKE), s_wrist));
+    new Trigger(() -> gamepad.getRawAxis(3) > 0.5)
+        .whileTrue(
+            new RunCommand(
+                () -> s_wrist.goToAngle(WristSubsystem.Positions.SUBSTATION_INTAKE), s_wrist));
 
     // LED controls
     new JoystickButton(gamepad, XboxController.Button.kX.value)
         .whileTrue(
             new ParallelCommandGroup(
                 new RunCommand(() -> s_Intake.setGamePiece(GamePiece.Cube))
-                //new RunCommand(() -> m_limelight.setPipeline(LimelightSubsystem.Pipeline.AprilTags))
+                // new RunCommand(() ->
+                // m_limelight.setPipeline(LimelightSubsystem.Pipeline.AprilTags))
                 // new RunCommand(() -> s_Intake.runIntake(0.5), s_Intake)
                 ));
     new JoystickButton(gamepad, XboxController.Button.kY.value)
         .whileTrue(
             new ParallelCommandGroup(
                 new RunCommand(() -> s_Intake.setGamePiece(GamePiece.Cone))
-                //new RunCommand(() -> m_limelight.setPipeline(LimelightSubsystem.Pipeline.RetroTape))
+                // new RunCommand(() ->
+                // m_limelight.setPipeline(LimelightSubsystem.Pipeline.RetroTape))
                 // new RunCommand(() -> s_Intake.runIntake(-0.5), s_Intake)
                 ));
   }
