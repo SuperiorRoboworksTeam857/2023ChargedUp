@@ -57,7 +57,6 @@ public class RobotContainer {
   public final WristSubsystem s_wrist = new WristSubsystem();
   //public final EntireArmSubsystem s_EntireArm = new EntireArmSubsystem();
 
-  public final LEDSubsystem s_LED = new LEDSubsystem();
   public final IntakeSubsystem s_Intake = new IntakeSubsystem();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -191,7 +190,6 @@ public class RobotContainer {
     new JoystickButton(gamepad, XboxController.Button.kX.value)
         .whileTrue(
             new ParallelCommandGroup(
-                new RunCommand(() -> s_LED.setPurple(), s_LED),
                 new RunCommand(() -> s_Intake.setGamePiece(GamePiece.Cube))
                 //new RunCommand(() -> m_limelight.setPipeline(LimelightSubsystem.Pipeline.AprilTags))
                 // new RunCommand(() -> s_Intake.runIntake(0.5), s_Intake)
@@ -199,7 +197,6 @@ public class RobotContainer {
     new JoystickButton(gamepad, XboxController.Button.kY.value)
         .whileTrue(
             new ParallelCommandGroup(
-                new RunCommand(() -> s_LED.setYellow(), s_LED),
                 new RunCommand(() -> s_Intake.setGamePiece(GamePiece.Cone))
                 //new RunCommand(() -> m_limelight.setPipeline(LimelightSubsystem.Pipeline.RetroTape))
                 // new RunCommand(() -> s_Intake.runIntake(-0.5), s_Intake)
