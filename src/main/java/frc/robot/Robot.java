@@ -60,7 +60,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     m_robotContainer.m_limelight.turnOnDriverCam();
     m_robotContainer.m_limelight.enableLimelight(false);
-    
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -81,7 +81,7 @@ public class Robot extends TimedRobot {
     // this line or comment it out.
     m_robotContainer.m_limelight.turnOnDriverCam();
     m_robotContainer.m_limelight.enableLimelight(false);
-    
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
