@@ -19,7 +19,8 @@ import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.RobotContainer;
 import frc.robot.commands.TurnToAngleCommand;
-import frc.robot.subsystems.ElevatorSubsystem.Positions;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.WristSubsystem;
 
 public class testAuto extends SequentialCommandGroup {
   public testAuto(RobotContainer robot) {
@@ -129,18 +130,21 @@ public class testAuto extends SequentialCommandGroup {
             () ->
                 robot.s_Swerve.resetOdometry(
                     new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(0)))),
-        new InstantCommand(() -> robot.s_elevator.goToPosition(Positions.HIGH), robot.s_elevator),
-        new WaitUntilCommand(robot.s_elevator::isElevatorAtGoal),
-        new WaitCommand(1),
-        new InstantCommand(() -> robot.s_elevator.goToPosition(Positions.FLOOR), robot.s_elevator),
-        new WaitUntilCommand(robot.s_elevator::isElevatorAtGoal),
-        swerveControllerCommand1,
+        // new InstantCommand(
+        //     () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT),
+        //     robot.s_wrist),
+        // new InstantCommand(() -> robot.s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH), robot.s_elevator),
+        // new WaitUntilCommand(robot.s_elevator::isElevatorAtGoal),
+        // new WaitCommand(1),
+        // new InstantCommand(() -> robot.s_elevator.goToPosition(ElevatorSubsystem.Positions.FLOOR), robot.s_elevator),
+        // new WaitUntilCommand(robot.s_elevator::isElevatorAtGoal),
+        // swerveControllerCommand1,
         new TurnToAngleCommand(robot.s_Swerve, 150, 2),
-        swerveControllerCommand2,
-        new InstantCommand(() -> robot.s_Swerve.drive(new Translation2d(0, 0), 0, false, true)),
-        new WaitCommand(1),
-        new TurnToAngleCommand(robot.s_Swerve, 0, 2),
-        swerveControllerCommand4,
+        // swerveControllerCommand2,
+        // new InstantCommand(() -> robot.s_Swerve.drive(new Translation2d(0, 0), 0, false, true)),
+        // new WaitCommand(1),
+        // new TurnToAngleCommand(robot.s_Swerve, 0, 2),
+        // swerveControllerCommand4,
         new InstantCommand(() -> robot.s_Swerve.drive(new Translation2d(0, 0), 0, false, true)));
   }
 }
