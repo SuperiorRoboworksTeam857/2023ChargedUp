@@ -13,14 +13,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.RobotContainer;
 import frc.robot.commands.TurnToAngleCommand;
-import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.WristSubsystem;
 
 public class testAuto extends SequentialCommandGroup {
   public testAuto(RobotContainer robot) {
@@ -133,10 +129,12 @@ public class testAuto extends SequentialCommandGroup {
         // new InstantCommand(
         //     () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT),
         //     robot.s_wrist),
-        // new InstantCommand(() -> robot.s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH), robot.s_elevator),
+        // new InstantCommand(() -> robot.s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH),
+        // robot.s_elevator),
         // new WaitUntilCommand(robot.s_elevator::isElevatorAtGoal),
         // new WaitCommand(1),
-        // new InstantCommand(() -> robot.s_elevator.goToPosition(ElevatorSubsystem.Positions.FLOOR), robot.s_elevator),
+        // new InstantCommand(() ->
+        // robot.s_elevator.goToPosition(ElevatorSubsystem.Positions.FLOOR), robot.s_elevator),
         // new WaitUntilCommand(robot.s_elevator::isElevatorAtGoal),
         // swerveControllerCommand1,
         new TurnToAngleCommand(robot.s_Swerve, 150, 2),
