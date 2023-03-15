@@ -138,6 +138,11 @@ public class AutoRedRightTwoHigh extends SequentialCommandGroup {
                 robot.s_Swerve.resetOdometry(
                     new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(0)))),
 
+        // Set LEDs to yellow
+        new InstantCommand(
+            () -> robot.s_Intake.setGamePiece(IntakeSubsystem.GamePiece.Cone),
+            robot.s_Intake),        
+
         // Raise elevator and tilt wrist slightly out
         new InstantCommand(
             () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT),
