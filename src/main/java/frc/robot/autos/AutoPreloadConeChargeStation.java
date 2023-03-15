@@ -87,13 +87,11 @@ public class AutoPreloadConeChargeStation extends SequentialCommandGroup {
 
         // Set LEDs to yellow
         new InstantCommand(
-            () -> robot.s_Intake.setGamePiece(IntakeSubsystem.GamePiece.Cone),
-            robot.s_Intake),
+            () -> robot.s_Intake.setGamePiece(IntakeSubsystem.GamePiece.Cone), robot.s_Intake),
 
         // Raise elevator and tilt wrist slightly out
         new InstantCommand(
-            () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT),
-            robot.s_wrist),
+            () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT), robot.s_wrist),
         new InstantCommand(
             () -> robot.s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH),
             robot.s_elevator),

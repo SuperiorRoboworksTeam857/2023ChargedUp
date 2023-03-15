@@ -47,30 +47,6 @@ public class AutoRedRightTwoHigh extends SequentialCommandGroup {
                 2, // AutoConstants.kMaxSpeedMetersPerSecond,
                 AutoConstants.kMaxAccelerationMetersPerSecondSquared),
             new PathPoint(
-                new Translation2d(Units.inchesToMeters(150), Units.inchesToMeters(0)),
-                Rotation2d.fromDegrees(0),
-                Rotation2d.fromDegrees(-150)),
-            new PathPoint(
-                new Translation2d(Units.inchesToMeters(180), Units.inchesToMeters(0)),
-                Rotation2d.fromDegrees(0),
-                Rotation2d.fromDegrees(-150)));
-    // PathPlannerTrajectory trajectory3 =
-    //     PathPlanner.generatePath(
-    //         new PathConstraints(
-    //             AutoConstants.kMaxSpeedMetersPerSecond,
-    //             AutoConstants.kMaxAccelerationMetersPerSecondSquared),
-    //         new PathPoint(
-    //             new Translation2d(Units.inchesToMeters(-230), Units.inchesToMeters(0)),
-    // Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(150)),
-    //         new PathPoint(
-    //             new Translation2d(Units.inchesToMeters(-180), Units.inchesToMeters(0)),
-    // Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(150)));
-    PathPlannerTrajectory trajectory4 =
-        PathPlanner.generatePath(
-            new PathConstraints(
-                2, // AutoConstants.kMaxSpeedMetersPerSecond,
-                AutoConstants.kMaxAccelerationMetersPerSecondSquared),
-            new PathPoint(
                 new Translation2d(Units.inchesToMeters(195), Units.inchesToMeters(0)),
                 Rotation2d.fromDegrees(180),
                 Rotation2d.fromDegrees(-155)),
@@ -111,26 +87,6 @@ public class AutoRedRightTwoHigh extends SequentialCommandGroup {
             new PIDController(Constants.AutoConstants.kPThetaController, 0, 0),
             robot.s_Swerve::setModuleStates,
             robot.s_Swerve);
-    // PPSwerveControllerCommand swerveControllerCommand3 =
-    //     new PPSwerveControllerCommand(
-    //         trajectory3,
-    //         robot.s_Swerve::getPose,
-    //         Constants.Swerve.swerveKinematics,
-    //         new PIDController(Constants.AutoConstants.kPXController, 0, 0),
-    //         new PIDController(Constants.AutoConstants.kPYController, 0, 0),
-    //         new PIDController(Constants.AutoConstants.kPThetaController, 0, 0),
-    //         robot.s_Swerve::setModuleStates,
-    //         robot.s_Swerve);
-    PPSwerveControllerCommand swerveControllerCommand4 =
-        new PPSwerveControllerCommand(
-            trajectory4,
-            robot.s_Swerve::getPose,
-            Constants.Swerve.swerveKinematics,
-            new PIDController(Constants.AutoConstants.kPXController, 0, 0),
-            new PIDController(Constants.AutoConstants.kPYController, 0, 0),
-            new PIDController(Constants.AutoConstants.kPThetaController, 0, 0),
-            robot.s_Swerve::setModuleStates,
-            robot.s_Swerve);
 
     addCommands(
         new InstantCommand(
@@ -140,13 +96,11 @@ public class AutoRedRightTwoHigh extends SequentialCommandGroup {
 
         // Set LEDs to yellow
         new InstantCommand(
-            () -> robot.s_Intake.setGamePiece(IntakeSubsystem.GamePiece.Cone),
-            robot.s_Intake),        
+            () -> robot.s_Intake.setGamePiece(IntakeSubsystem.GamePiece.Cone), robot.s_Intake),
 
         // Raise elevator and tilt wrist slightly out
         new InstantCommand(
-            () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT),
-            robot.s_wrist),
+            () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT), robot.s_wrist),
         new InstantCommand(
             () -> robot.s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH),
             robot.s_elevator),
@@ -181,36 +135,22 @@ public class AutoRedRightTwoHigh extends SequentialCommandGroup {
                 new InstantCommand(
                     () -> robot.s_Intake.intakeGamePiece(IntakeSubsystem.GamePiece.Cube),
                     robot.s_Intake))),
-
         new InstantCommand(() -> robot.s_Swerve.drive(new Translation2d(0, 0), 0, false, true)),
-        // Turn to angle
-        // new TurnToAngleCommand(robot.s_Swerve, -90, 2),
-
-        // Drive at next game piece while intaking
-        // swerveControllerCommand2,
 
         // Raise wrist
         new InstantCommand(
             () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.VERTICAL), robot.s_wrist),
         new InstantCommand(() -> robot.s_Intake.runIntake(0), robot.s_Intake),
 
-        // Stop
-        // new InstantCommand(() -> robot.s_Swerve.drive(new Translation2d(0, 0), 0, false, true)),
-
-        // Turn back to drive station
-        // new TurnToAngleCommand(robot.s_Swerve, 0, 2),
-
         // Drive at drive station
-        swerveControllerCommand4,
+        swerveControllerCommand2,
         new InstantCommand(() -> robot.s_Swerve.drive(new Translation2d(0, 0), 0, false, true)),
 
         // Raise elevator and tilt wrist slightly out
         new InstantCommand(
-            () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT),
-            robot.s_wrist),
+            () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT), robot.s_wrist),
         new InstantCommand(
-            () -> robot.s_elevator.goToPosition(ElevatorSubsystem.Positions.MID),
-            robot.s_elevator),
+            () -> robot.s_elevator.goToPosition(ElevatorSubsystem.Positions.MID), robot.s_elevator),
         new WaitUntilCommand(robot.s_elevator::isElevatorAtGoal),
 
         // Spit out game piece

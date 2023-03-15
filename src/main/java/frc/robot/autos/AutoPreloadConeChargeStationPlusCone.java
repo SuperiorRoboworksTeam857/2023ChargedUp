@@ -21,7 +21,6 @@ import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.RobotContainer;
 import frc.robot.commands.SelfBalanceCommand;
-import frc.robot.commands.TurnToAngleCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.WristSubsystem;
@@ -44,20 +43,7 @@ public class AutoPreloadConeChargeStationPlusCone extends SequentialCommandGroup
                 new Translation2d(Units.inchesToMeters(200), Units.inchesToMeters(0)),
                 Rotation2d.fromDegrees(0),
                 Rotation2d.fromDegrees(180)));
-
-    // PathPlannerTrajectory trajectory2 =
-    //     PathPlanner.generatePath(
-    //         new PathConstraints(1.5, AutoConstants.kMaxAccelerationMetersPerSecondSquared),
-    //         new PathPoint(
-    //             new Translation2d(Units.inchesToMeters(178), Units.inchesToMeters(0)),
-    //             Rotation2d.fromDegrees(0),
-    //             Rotation2d.fromDegrees(180)),
-    //         new PathPoint(
-    //             new Translation2d(Units.inchesToMeters(200), Units.inchesToMeters(0)),
-    //             Rotation2d.fromDegrees(0),
-    //             Rotation2d.fromDegrees(180)));
-
-    PathPlannerTrajectory trajectory3 =
+    PathPlannerTrajectory trajectory2 =
         PathPlanner.generatePath(
             new PathConstraints(1.5, AutoConstants.kMaxAccelerationMetersPerSecondSquared),
             new PathPoint(
@@ -87,19 +73,9 @@ public class AutoPreloadConeChargeStationPlusCone extends SequentialCommandGroup
             new PIDController(Constants.AutoConstants.kPThetaController, 0, 0),
             robot.s_Swerve::setModuleStates,
             robot.s_Swerve);
-    // PPSwerveControllerCommand swerveControllerCommand2 =
-    //     new PPSwerveControllerCommand(
-    //         trajectory2,
-    //         robot.s_Swerve::getPose,
-    //         Constants.Swerve.swerveKinematics,
-    //         new PIDController(Constants.AutoConstants.kPXController, 0, 0),
-    //         new PIDController(Constants.AutoConstants.kPYController, 0, 0),
-    //         new PIDController(Constants.AutoConstants.kPThetaController, 0, 0),
-    //         robot.s_Swerve::setModuleStates,
-    //         robot.s_Swerve);
-    PPSwerveControllerCommand swerveControllerCommand3 =
+    PPSwerveControllerCommand swerveControllerCommand2 =
         new PPSwerveControllerCommand(
-            trajectory3,
+            trajectory2,
             robot.s_Swerve::getPose,
             Constants.Swerve.swerveKinematics,
             new PIDController(Constants.AutoConstants.kPXController, 0, 0),
@@ -116,13 +92,11 @@ public class AutoPreloadConeChargeStationPlusCone extends SequentialCommandGroup
 
         // Set LEDs to yellow
         new InstantCommand(
-            () -> robot.s_Intake.setGamePiece(IntakeSubsystem.GamePiece.Cone),
-            robot.s_Intake), 
+            () -> robot.s_Intake.setGamePiece(IntakeSubsystem.GamePiece.Cone), robot.s_Intake),
 
         // Raise elevator and tilt wrist slightly out
         new InstantCommand(
-            () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT),
-            robot.s_wrist),
+            () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.SLIGHTLY_OUT), robot.s_wrist),
         new InstantCommand(
             () -> robot.s_elevator.goToPosition(ElevatorSubsystem.Positions.HIGH),
             robot.s_elevator),
@@ -158,22 +132,14 @@ public class AutoPreloadConeChargeStationPlusCone extends SequentialCommandGroup
                 // Drive into cone and pick it up
                 new InstantCommand(
                     () -> robot.s_Intake.intakeGamePiece(IntakeSubsystem.GamePiece.Cone),
-                    robot.s_Intake)
-            )
-        ),
-
-        // // Turn to face pre-setup cone
-        // new TurnToAngleCommand(robot.s_Swerve, 180, 2),
-
-
-        //swerveControllerCommand2,
+                    robot.s_Intake))),
 
         // Raise wrist
         new InstantCommand(
             () -> robot.s_wrist.goToAngle(WristSubsystem.Positions.VERTICAL), robot.s_wrist),
 
         // Drive back on charge station
-        swerveControllerCommand3,
+        swerveControllerCommand2,
 
         // Stop intake
         new InstantCommand(() -> robot.s_Intake.runIntake(0), robot.s_Intake),
